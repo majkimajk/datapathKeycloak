@@ -22,7 +22,7 @@ Inside
 Modify datasource
 ```$xslt
                 <datasource jndi-name="java:jboss/datasources/KeycloakDS" pool-name="KeycloakDS" enabled="true" use-java-context="true">
-                    <connection-url>jjdbc:mysql://localhost:3306/datapath_db?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC&autoReconnect=true</connection-url>
+                    <connection-url>jdbc:mysql://localhost:3306/datapath_db?autoReconnect=true</connection-url>
                     <connection-property name="autoCommit">
                         true
                     </connection-property>
@@ -51,7 +51,7 @@ And add mysql provider (which is installed later).  Add new **<driver>** tag in 
 
 3.Install dependencies
 ```
-    C:/keycloak/keycloak-4.8.3.Final/bin/jboss-cli.sh --command="module add --name=com.mysql --resources=mysql-connector-java-5.1.38.jar --dependencies=javax.api"
+    C:/keycloak/keycloak-5.0.0/bin/jboss-cli.sh --command="module add --name=com.mysql --resources=mysql-connector-java-5.1.38.jar --dependencies=javax.api"
 ```
 4.Build project
 ```
@@ -59,7 +59,7 @@ mvn clean package
 ```
 5.Add module **keycloak-longer-attributes* (see)
 ```
-C:/keycloak/keycloak-4.8.3.Final/bin/jboss-cli.sh --command="module add --name=org.keycloak.keycloak-longer-attributes --resources=target/keycloak-longer-attributes-jar-with-dependencies.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-services,org.keycloak.keycloak-model-jpa,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,javax.ws.rs.api,javax.persistence.api,org.hibernate,org.javassist,org.liquibase"
+C:/keycloak/keycloak-5.0.0/bin/jboss-cli.sh --command="module add --name=org.keycloak.keycloak-longer-attributes --resources=target/keycloak-longer-attributes-jar-with-dependencies.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-common,org.jboss.logging,org.keycloak.keycloak-services,org.keycloak.keycloak-model-jpa,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,javax.ws.rs.api,javax.persistence.api,org.hibernate,org.javassist,org.liquibase,javax.api,javax.annotation.api,javax.xml.ws.api,javax.jws.api,javax.servlet.api"
 ```
 
 

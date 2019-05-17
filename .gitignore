@@ -1,0 +1,5 @@
+# Created by .ignore support plugin (hsz.mobi)
+.idea/sonarlint/issuestore/a/
+.idea/workspace.xml
+src/test/
+target/
