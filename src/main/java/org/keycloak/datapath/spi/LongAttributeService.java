@@ -26,6 +26,8 @@ public interface LongAttributeService extends Provider {
 
     List<LongAttributesMapping> getAttributeList(String userId);
 
-    void addAttributes(List<LongAttributesMapping> attributes);
+    void addAttributes(List<LongAttributesMapping> attributes, String userId);
+
+    void deleteAttribute(LongAttributesMapping attribute, String userId);
 
 }

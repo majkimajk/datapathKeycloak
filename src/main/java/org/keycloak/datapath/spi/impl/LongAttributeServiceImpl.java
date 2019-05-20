@@ -22,10 +22,11 @@ import org.keycloak.datapath.model.LongAttributesMapping;
 import org.keycloak.datapath.spi.LongAttributeService;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
-import org.keycloak.models.utils.KeycloakModelUtils;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import java.util.List;
+import java.util.Optional;
 
 public class LongAttributeServiceImpl implements LongAttributeService {
 
@@ -48,21 +49,47 @@ public class LongAttributeServiceImpl implements LongAttributeService {
 
     @Override
     public List<LongAttributesMapping> getAttributeList(String userId) {
-        return getEntityManager().createNamedQuery("findByUserId", LongAttributesMapping.class)
-                .setParameter("userId", userId)
-                .getResultList();
+        TypedQuery<LongAttributesMapping> namedQuery = this.getEntityManager().createNamedQuery("LongAttributesMapping.findByUserId", LongAttributesMapping.class);
+        namedQuery.setParameter("userId", userId);
+        return namedQuery.getResultList();
     }
 
     @Override
-    public void addAttributes(List<LongAttributesMapping> attributes) {
+    public void addAttributes(List<LongAttributesMapping> attributes, String userId) {
         attributes.forEach(attribute -> {
-            LongAttributesMapping entity = new LongAttributesMapping();
-            String id = KeycloakModelUtils.generateId();
-            //entity.setId(id);
-            entity.setAttributeKey(attribute.getAttributeKey());
-            entity.setAttributeValue(attribute.getAttributeValue());
-            getEntityManager().persist(entity);
+            EntityManager entityManager = getEntityManager();
+            Optional<LongAttributesMapping> optionalEntityToUpdate = findAttribute(userId, attribute.getAttributeKey(), entityManager);
+            if (!optionalEntityToUpdate.isPresent()) {
+                LongAttributesMapping entity = new LongAttributesMapping();
+                entity.setUserId(userId);
+                entity.setAttributeKey(attribute.getAttributeKey());
+                entity.setAttributeValue(attribute.getAttributeValue());
+                entityManager.persist(entity);
+            } else {
+                LongAttributesMapping entityToUpdate = optionalEntityToUpdate.get();
+                entityToUpdate.setAttributeValue(attribute.getAttributeValue());
+                entityManager.merge(entityToUpdate);
+            }
         });
+    }
+
+    @Override
+    public void deleteAttribute(LongAttributesMapping attribute, String userId) {
+        EntityManager entityManager = getEntityManager();
+        Optional<LongAttributesMapping> optionalEntityToDelete = findAttribute(userId, attribute.getAttributeKey(), entityManager);
+        optionalEntityToDelete.ifPresent(entityManager::remove);
+    }
+
+    private Optional<LongAttributesMapping> findAttribute(String userId, String attibuteKey, EntityManager entityManager) {
+        try {
+            TypedQuery<LongAttributesMapping> namedQuery = entityManager.createNamedQuery("LongAttributesMapping.findByUserIdAndAttributeKey", LongAttributesMapping.class);
+            namedQuery.setParameter("userId", userId);
+            namedQuery.setParameter("attributeKey", attibuteKey);
+            LongAttributesMapping singleResult = namedQuery.getSingleResult();
+            return Optional.ofNullable(singleResult);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
     public void close() {

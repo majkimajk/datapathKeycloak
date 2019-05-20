@@ -14,7 +14,7 @@
             <column name="USER_ID" type="VARCHAR(100)">
                 <constraints nullable="false"/>
             </column>
-            <column name="ATTRIBUTE_KEY" type="TEXT">
+            <column name="ATTRIBUTE_KEY" type="VARCHAR(512)">
                 <constraints nullable="false"/>
             </column>
             <column name="ATTRIBUTE_VALUE" type="TEXT">
@@ -29,6 +29,13 @@
         <createIndex tableName="LONG_ATTRIBUTES_MAPPING" indexName="LONG_ATTRIBUTES_MAPPING_USER_ID_IDX">
             <column name="USER_ID"/>
         </createIndex>
+
+        <addUniqueConstraint columnNames="USER_ID, ATTRIBUTE_KEY"
+                             constraintName="user_id_attr_key_uq_constr"
+                             deferrable="true"
+                             disabled="true"
+                             initiallyDeferred="true"
+                             tableName="LONG_ATTRIBUTES_MAPPING"/>
 
     </changeSet>
 

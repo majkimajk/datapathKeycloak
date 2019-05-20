@@ -4,7 +4,10 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "LONG_ATTRIBUTES_MAPPING")
-@NamedQueries({@NamedQuery(name = "LongAttributesMapping.findByUserId", query = "from LongAttributesMapping where userId = :userId")})
+@NamedQueries({
+        @NamedQuery(name = "LongAttributesMapping.findByUserId", query = "from LongAttributesMapping where userId = :userId"),
+        @NamedQuery(name = "LongAttributesMapping.findByUserIdAndAttributeKey", query = "from LongAttributesMapping where (userId = :userId and attributeKey = :attributeKey)")
+})
 public class LongAttributesMapping extends AbstractEntity {
 
     @Column(name = "USER_ID", nullable = false)

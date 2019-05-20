@@ -8,8 +8,7 @@ import org.keycloak.datapath.spi.LongAttributeService;
 import org.keycloak.models.KeycloakSession;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
+import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.List;
 
@@ -30,19 +29,35 @@ public class LongAttributesRestResource {
     }
 
 
+    @GET
+    @Path("/{userId}/longAttributes")
+    public Response getLongAttributes(@PathParam("userId") String userId, @Context UriInfo uriInfo,
+                                      @Context HttpServletRequest httpServletRequest,
+                                      @Context HttpHeaders headers) throws JsonProcessingException {
+        final LongAttributeService attributeService = this.session.getProvider(LongAttributeService.class);
+        List<LongAttributesMapping> attributesMappings = attributeService.getAttributeList(userId);
+        return Response.ok(MAPPER.writeValueAsBytes(attributesMappings)).type(MediaType.APPLICATION_JSON_TYPE).build();
+    }
 
     @POST
-    @Path("/longAttributes")
-    public Response getLongAttributes(@Context UriInfo uriInfo,
-                                 @Context HttpServletRequest httpServletRequest,
-                                 @Context HttpHeaders headers) throws JsonProcessingException {
+    @Path("{userId}/longAttributes")
+    public Response addOrUpdateLongAttributes(@PathParam("userId") String userId, List<LongAttributesMapping> attributes) throws JsonProcessingException {
+
         final LongAttributeService attributeService = this.session.getProvider(LongAttributeService.class);
-        List<LongAttributesMapping> attributesMappings = attributeService.getAttributeList("333");
-        return createTokenNotActiveResponse();
+        attributeService.addAttributes(attributes, userId);
+        return okResponse();
     }
 
-    private Response createTokenNotActiveResponse() throws JsonProcessingException {
-        return Response.ok(MAPPER.writeValueAsBytes("aaaa")).type(MediaType.APPLICATION_JSON_TYPE).build();
+    @DELETE
+    @Path("{userId}/longAttributes")
+    public Response deleteLongAttribute(@PathParam("userId") String userId, LongAttributesMapping attribute) throws JsonProcessingException {
+        final LongAttributeService attributeService = this.session.getProvider(LongAttributeService.class);
+        attributeService.deleteAttribute(attribute, userId);
+        return okResponse();
     }
 
+
+    private Response okResponse() throws JsonProcessingException {
+        return Response.ok(MAPPER.writeValueAsBytes("done")).type(MediaType.APPLICATION_JSON_TYPE).build();
+    }
 }
