@@ -56,8 +56,17 @@ public class LongAttributesRestResource {
         return okResponse();
     }
 
+    @POST
+    @Path("{userId}/update/longAttributes")
+    public Response updateLongAttributes(@PathParam("userId") String userId, List<LongAttributesMapping> attributes) throws JsonProcessingException {
+
+        final LongAttributeService attributeService = this.session.getProvider(LongAttributeService.class);
+        attributeService.updateAttributes(attributes, userId);
+        return okResponse();
+    }
+
 
     private Response okResponse() throws JsonProcessingException {
-        return Response.ok(MAPPER.writeValueAsBytes("done")).type(MediaType.APPLICATION_JSON_TYPE).build();
+        return Response.ok(MAPPER.writeValueAsBytes("OK")).type(MediaType.APPLICATION_JSON_TYPE).build();
     }
 }

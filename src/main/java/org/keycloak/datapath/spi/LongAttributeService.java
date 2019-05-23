@@ -30,4 +30,6 @@ public interface LongAttributeService extends Provider {
 
     void deleteAttribute(LongAttributesMapping attribute, String userId);
 
+    void updateAttributes(List<LongAttributesMapping> attributes, String userId);
+
 }

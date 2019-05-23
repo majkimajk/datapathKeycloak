@@ -27,6 +27,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class LongAttributeServiceImpl implements LongAttributeService {
 
@@ -78,6 +79,29 @@ public class LongAttributeServiceImpl implements LongAttributeService {
         EntityManager entityManager = getEntityManager();
         Optional<LongAttributesMapping> optionalEntityToDelete = findAttribute(userId, attribute.getAttributeKey(), entityManager);
         optionalEntityToDelete.ifPresent(entityManager::remove);
+    }
+
+    @Override
+    public void updateAttributes(List<LongAttributesMapping> newAttributes, String userId) {
+        EntityManager entityManager = getEntityManager();
+        List<LongAttributesMapping> currentAttributes = getAttributeList(userId);
+        List<LongAttributesMapping> attrToRemove = getAttributesToRemove(currentAttributes, newAttributes);
+        attrToRemove.forEach(entityManager::remove);
+        addAttributes(newAttributes, userId);
+    }
+
+    private List<LongAttributesMapping> getAttributesToRemove(List<LongAttributesMapping> currentAttributes, List<LongAttributesMapping> newAttributes) {
+        return currentAttributes.stream()
+                .filter(currentAttribute -> {
+                    boolean isToRemove = true;
+                    for (LongAttributesMapping newAttribute : newAttributes) {
+                        if (currentAttribute.getAttributeKey().equals(newAttribute.getAttributeKey())) {
+                            isToRemove = false;
+                        }
+                    }
+                    return isToRemove;
+                })
+                .collect(Collectors.toList());
     }
 
     private Optional<LongAttributesMapping> findAttribute(String userId, String attibuteKey, EntityManager entityManager) {
