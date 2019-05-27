@@ -15,26 +15,24 @@
                 <th>{{:: 'actions' | translate}}</th>
             </tr>
             </thead>
-            <tbody id="longAttributesTable">
-            <tr ng-repeat="(key, value) in user.longAttributes | toOrderedMapSortedByKey">
-                <td>{{key}}</td>
-                <td><input ng-model="user.longAttributes[key]" class="form-control" type="text" name="{{key}}" id="attribute-{{key}}" /></td>
-                <td class="kc-action-cell" data-ng-click="removeLongAttribute(key)">{{:: 'delete' | translate}}</td>
-            </tr>
-            </tbody>
             <tbody>
+            <tr ng-repeat="(key, value) in lAttr | toOrderedMapSortedByKey">
+                <td>{{key}}</td>
+                <td><input ng-model="lAttr[key]" class="form-control" type="text" name="{{key}}" id="attribute-{{key}}" /></td>
+                <td class="kc-action-cell" data-ng-click="removeLongerAttribute(key)">{{:: 'delete' | translate}}</td>
+            </tr>
             <tr>
-                <td><input ng-model="newLongAttribute.key" class="form-control" type="text" id="newLongAttributeKey" /></td>
-                <td><input ng-model="newLongAttribute.value" class="form-control" type="text" id="newLongAttributeValue" /></td>
-                <td class="kc-action-cell" onClick="addLongAttribute()" data-ng-disabled="!newLongAttribute.key.length || !newLongAttribute.value.length">{{:: 'add' | translate}}</td>
+                <td><input ng-model="newLongerAttribute.key" class="form-control" type="text" id="newLongerAttribute" /></td>
+                <td><input ng-model="newLongerAttribute.value" class="form-control" type="text" id="newLongerAttribute" /></td>
+                <td class="kc-action-cell" data-ng-click="addLongerAttribute()" data-ng-disabled="!newLongerAttribute.key.length || !newLongerAttribute.value.length">{{:: 'add' | translate}}</td>
             </tr>
             </tbody>
         </table>
 
         <div class="form-group" data-ng-show="user.access.manage">
             <div class="col-md-12">
-                <button id="saveLongerAttributes" data-ng-click="saveCurrentLongerAttributes()" kc-save disabled>{{:: 'save' | translate}}</button>
-                <button id="resetLongerAttributes" onclick="resetCurrentLongerAttributes()" kc-reset disabled>{{:: 'cancel' | translate}}</button>
+                <button kc-save  data-ng-disabled="!changed">{{:: 'save' | translate}}</button>
+                <button kc-reset data-ng-disabled="!changed">{{:: 'cancel' | translate}}</button>
             </div>
         </div>
     </form>
