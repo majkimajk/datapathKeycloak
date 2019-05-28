@@ -143,10 +143,6 @@
                         <goals>
                             <goal>copy</goal>
                         </goals>
-                        <configuration>
-                            <sourceFile>src/main/resources/META-INF/kc-umm-${env}.properties</sourceFile>
-                            <destinationFile>src/main/resources/META-INF/kc-umm.properties</destinationFile>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>

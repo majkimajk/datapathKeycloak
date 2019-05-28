@@ -22,8 +22,8 @@
                 <td class="kc-action-cell" data-ng-click="removeLongerAttribute(key)">{{:: 'delete' | translate}}</td>
             </tr>
             <tr>
-                <td><input ng-model="newLongerAttribute.key" class="form-control" type="text" id="newLongerAttribute" /></td>
-                <td><input ng-model="newLongerAttribute.value" class="form-control" type="text" id="newLongerAttribute" /></td>
+                <td><input ng-model="newLongerAttribute.key" class="form-control" type="text" id="newLongerAttributeKey" /></td>
+                <td><input ng-model="newLongerAttribute.value" class="form-control" type="text" id="newLongerAttributeValue" /></td>
                 <td class="kc-action-cell" data-ng-click="addLongerAttribute()" data-ng-disabled="!newLongerAttribute.key.length || !newLongerAttribute.value.length">{{:: 'add' | translate}}</td>
             </tr>
             </tbody>

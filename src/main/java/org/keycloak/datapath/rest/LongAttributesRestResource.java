@@ -3,7 +3,6 @@ package org.keycloak.datapath.rest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jboss.logging.Logger;
-import org.jboss.resteasy.spi.NotFoundException;
 import org.keycloak.common.ClientConnection;
 import org.keycloak.datapath.model.LongAttributesMapping;
 import org.keycloak.datapath.spi.LongAttributeService;
@@ -29,6 +28,8 @@ import java.util.List;
 public class LongAttributesRestResource {
 
     private static final Logger LOGGER = Logger.getLogger(LongAttributesRestResource.class);
+    private static final String AUTHENTICATED_MESSAGE = "authenticated admin access for: ";
+    private static final String ERROR_CAUGHT_DURING_AUTHORIZATION = "Error caught during authorization: )";
 
     private final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -50,57 +51,62 @@ public class LongAttributesRestResource {
     @Path("/{userId}/longAttributes")
     public Response getLongAttributes(@PathParam("userId") String userId, @Context UriInfo uriInfo,
                                       @Context HttpServletRequest httpServletRequest,
-                                      @Context HttpHeaders headers) throws JsonProcessingException {
+                                      @Context HttpHeaders headers) {
         try {
             AdminAuth auth = authenticateRealmAdminRequest(headers);
+            LOGGER.debug(AUTHENTICATED_MESSAGE + auth.getUser().getUsername());
             final LongAttributeService attributeService = this.session.getProvider(LongAttributeService.class);
             List<LongAttributesMapping> attributesMappings = attributeService.getAttributeList(userId);
             return Response.ok(MAPPER.writeValueAsBytes(attributesMappings)).type(MediaType.APPLICATION_JSON_TYPE).build();
         } catch (Exception e) {
-            return badResponse(e);
+            LOGGER.error(ERROR_CAUGHT_DURING_AUTHORIZATION + e.getMessage());
+            return unauthorizedResponse();
         }
     }
 
     @POST
     @Path("{userId}/longAttributes")
-    public Response addOrUpdateLongAttributes(@Context HttpHeaders headers, @PathParam("userId") String userId, List<LongAttributesMapping> attributes) throws JsonProcessingException {
-       try {
-           AdminAuth auth = authenticateRealmAdminRequest(headers);
-           final LongAttributeService attributeService = this.session.getProvider(LongAttributeService.class);
-           attributeService.addAttributes(attributes, userId);
-           return okResponse();
-       } catch (Exception e) {
-           return badResponse(e);
-       }
+    public Response addOrUpdateLongAttributes(@Context HttpHeaders headers, @PathParam("userId") String userId, List<LongAttributesMapping> attributes) {
+        try {
+            AdminAuth auth = authenticateRealmAdminRequest(headers);
+            LOGGER.debug(AUTHENTICATED_MESSAGE + auth.getUser().getUsername());
+            final LongAttributeService attributeService = this.session.getProvider(LongAttributeService.class);
+            attributeService.addAttributes(attributes, userId);
+            return okResponse();
+        } catch (Exception e) {
+            LOGGER.error(ERROR_CAUGHT_DURING_AUTHORIZATION + e.getMessage());
+            return unauthorizedResponse();
+        }
     }
 
     @DELETE
-    @Path("{userId}/longAttrixbutes")
-    public Response deleteLongAttribute(@Context HttpHeaders headers, @PathParam("userId") String userId, LongAttributesMapping attribute) throws JsonProcessingException {
+    @Path("{userId}/longAttributes")
+    public Response deleteLongAttribute(@Context HttpHeaders headers, @PathParam("userId") String userId, LongAttributesMapping attribute) {
         try {
             AdminAuth auth = authenticateRealmAdminRequest(headers);
-            LOGGER.debug("authenticated admin access for: " + auth.getUser().getUsername());
+            LOGGER.debug(AUTHENTICATED_MESSAGE + auth.getUser().getUsername());
             final LongAttributeService attributeService = this.session.getProvider(LongAttributeService.class);
             attributeService.deleteAttribute(attribute, userId);
             return okResponse();
         } catch (Exception e) {
-            return badResponse(e);
+            LOGGER.error(ERROR_CAUGHT_DURING_AUTHORIZATION + e.getMessage());
+            return unauthorizedResponse();
         }
     }
 
     @PUT
     @Path("{userId}/longAttributes")
-    public Response updateLongAttributes(@Context HttpHeaders headers, @PathParam("userId") String userId, List<LongAttributesMapping> attributes) throws JsonProcessingException {
+    public Response updateLongAttributes(@Context HttpHeaders headers, @PathParam("userId") String userId, List<LongAttributesMapping> attributes) {
         try {
             AdminAuth auth = authenticateRealmAdminRequest(headers);
-            LOGGER.debug("authenticated admin access for: " + auth.getUser().getUsername());
-            //final String accessToken = headers.getHeaderString("Authorization");
+            LOGGER.debug(AUTHENTICATED_MESSAGE + auth.getUser().getUsername());
             final LongAttributeService attributeService = this.session.getProvider(LongAttributeService.class);
             attributeService.updateAttributes(attributes, userId);
             return okResponse();
 
         } catch (Exception e) {
-            return badResponse(e);
+            LOGGER.error(ERROR_CAUGHT_DURING_AUTHORIZATION + e.getMessage());
+            return unauthorizedResponse();
         }
 
     }
@@ -110,11 +116,11 @@ public class LongAttributesRestResource {
         return Response.ok(MAPPER.writeValueAsBytes("OK")).type(MediaType.APPLICATION_JSON_TYPE).build();
     }
 
-    private Response badResponse(Exception e) throws JsonProcessingException {
-        return Response.ok(MAPPER.writeValueAsBytes(e.getCause())).type(MediaType.APPLICATION_JSON_TYPE).build();
+    private Response unauthorizedResponse() {
+        return Response.status(Response.Status.FORBIDDEN).type(MediaType.APPLICATION_JSON_TYPE).build();
     }
 
-    protected AdminAuth authenticateRealmAdminRequest(HttpHeaders headers) {
+    private AdminAuth authenticateRealmAdminRequest(HttpHeaders headers) {
         String tokenString = authManager.extractAuthorizationHeaderToken(headers);
         if (tokenString == null) throw new NotAuthorizedException("Bearer");
         AccessToken token;

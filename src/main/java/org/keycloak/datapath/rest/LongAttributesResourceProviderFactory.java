@@ -11,7 +11,7 @@ import org.keycloak.services.resource.RealmResourceProviderFactory;
  */
 public class LongAttributesResourceProviderFactory implements RealmResourceProviderFactory {
 
-    public static final String ID = "um-authz";
+    public static final String ID = "usr-ext";
 
     @Override
     public String getId() {

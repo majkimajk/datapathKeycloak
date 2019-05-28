@@ -28,14 +28,14 @@ module.controller('LongerAttributesCtrl', function($scope, realm, user, BruteFor
 
 	$scope.init =  function() {
 
-        var longAttrUrl = authUrl + "/realms/" + realm.id + "/um-authz/" + user.id + "/longAttributes";
+        var longAttrUrl = authUrl + "/realms/" + realm.id + "/usr-ext/" + user.id + "/longAttributes";
 
 		$http.get(longAttrUrl).then(function(response) {
-            responseData = response.data;
-			var lAttributesFromDB = convertAttributeValuesToMap(responseData)
-			$scope.lAttr = angular.copy(lAttributesFromDB);
+            var responseData = response.data;
+			$scope.lAttributesFromDB = convertAttributeValuesToMap(responseData)
+			$scope.lAttr = angular.copy($scope.lAttributesFromDB);
 			$scope.$watch('lAttr', function() {
-				if (!angular.equals($scope.lAttr, lAttributesFromDB)) {
+				if (!angular.equals($scope.lAttr, $scope.lAttributesFromDB)) {
 					$scope.changed = true;
 				}
 			}, true);
@@ -48,7 +48,7 @@ module.controller('LongerAttributesCtrl', function($scope, realm, user, BruteFor
 	$scope.init();
 
     $scope.save = function() {
-		var longAttrUrl = authUrl + "/realms/" + "test" + "/um-authz/" + "95d20c88-68a7-4689-88a9-3f447be22011" + "/longAttributes"
+		var longAttrUrl = authUrl + "/realms/" + realm.id + "/usr-ext/" + user.id + "/longAttributes"
         $http.put(longAttrUrl, convertAttributeValuesToRequest($scope.lAttr)).then(function(response) {
             var responseData = response.data;
             if (responseData ===  "OK") {
@@ -62,7 +62,7 @@ module.controller('LongerAttributesCtrl', function($scope, realm, user, BruteFor
 
 
     $scope.reset = function() {
-        $scope.lAttr = angular.copy(lAttr);
+        $scope.lAttr = angular.copy($scope.lAttributesFromDB);
         $scope.changed = false;
     };
 
@@ -103,5 +103,3 @@ module.controller('LongerAttributesCtrl', function($scope, realm, user, BruteFor
 
 
 });
-
-
